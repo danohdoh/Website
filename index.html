@@ -3,7 +3,6 @@
 <head>
   <title>YouTube VR Player</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
   <a-scene>
@@ -23,7 +22,6 @@
     const videoElement = document.querySelector("#video");
     const videoEntity = document.querySelector("#video-entity");
     const vrModeButton = document.querySelector("#vr-mode-button");
-    let player;
 
     AFRAME.registerComponent("cursor-listener", {
       init: function() {
@@ -39,29 +37,15 @@
 
     function enterVRMode() {
       vrModeButton.setAttribute("visible", "false");
-      player.playVideo();
+      videoElement.play();
     }
 
     function loadYouTubeVideo(videoId) {
-      player = new YT.Player("video", {
-        videoId: videoId,
-        playerVars: {
-          autoplay: 0,
-          controls: 0,
-          playsinline: 1,
-          rel: 0,
-          showinfo: 0,
-          iv_load_policy: 3,
-        },
-        events: {
-          onReady: onPlayerReady,
-        },
-      });
-    }
+      const youtubeUrl = `https://www.youtube.com/embed/${videoId}?autoplay=0&controls=0&playsinline=1&rel=0&showinfo=0&iv_load_policy=3`;
 
-    function onPlayerReady(event) {
-      videoEntity.setAttribute("visible", "true");
-      videoEntity.setAttribute("position", "0 0 -5");
+      videoElement.setAttribute("src", youtubeUrl);
+      videoElement.setAttribute("webkit-playsinline", "true");
+      videoElement.load();
     }
 
     const videoUrl = prompt("Enter a YouTube video URL:");
