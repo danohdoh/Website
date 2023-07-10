@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>YouTube VR Player</title>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+  <a-scene>
+    <a-entity id="player-entity" geometry="primitive: plane; height: 5; width: 9" material="shader: flat; color: black" position="0 1.6 -5"></a-entity>
+
+    <a-entity id="left-eye" camera="eye:left" look-controls></a-entity>
+    <a-entity id="right-eye" camera="eye:right" look-controls></a-entity>
+
+    <a-entity id="vr-mode-button" position="0 -3 0" text="value: Enter VR Mode; align: center" geometry="primitive: plane; width: 4; height: 0.5" material="shader: flat; color: red" cursor-listener></a-entity>
+  </a-scene>
+
+  <script>
+    const playerEntity = document.querySelector("#player-entity");
+    const vrModeButton = document.querySelector("#vr-mode-button");
+    let player;
+    const videoUrl = prompt("Enter a YouTube video URL:");
+
+    AFRAME.registerComponent("cursor-listener", {
+      init: function() {
+        this.el.addEventListener("click", () => {
+          if (AFRAME.utils.device.isMobile()) {
+            enterVRMode();
+          } else {
+            alert("This feature is only supported on mobile devices.");
+          }
+        });
+      },
+    });
+
+    function enterVRMode() {
+      vrModeButton.setAttribute("visible", "false");
+      player.playVideo();
+    }
+
+    function onYouTubeIframeAPIReady() {
+      const videoId = getVideoIdFromUrl(videoUrl);
+      player = new YT.Player("player-entity", {
+        videoId: videoId,
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          enablejsapi: 1,
+          modestbranding: 1,
+          rel: 0,
+          showinfo: 0,
+          iv_load_policy: 3,
+        },
+        events: {
+          onReady: onPlayerReady,
+        },
+      });
+    }
+
+    function onPlayerReady(event) {
+      playerEntity.setAttribute("material", "src", "#video");
+      playerEntity.setAttribute("visible", "true");
+    }
+
+    function getVideoIdFromUrl(url) {
+      const regex = /^(?:https?:\/\/)?(?:www\.)?youtu(?:\.be|be\.com)\/(?:watch\?v=|embed\/|v\/|\/)([^&?]{11})/;
+      const match = url.match(regex);
+      return match ? match[1] : null;
+    }
+
+    // Wait for the YouTube IFrame API to load
+    window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+  </script>
+</body>
+</html>
