@@ -7,10 +7,10 @@
 <body>
   <a-scene>
     <a-assets>
-      <video id="video" crossorigin="anonymous" webkit-playsinline></video>
+      <video id="video" crossorigin="anonymous" autoplay webkit-playsinline></video>
     </a-assets>
     
-    <a-entity id="video-entity" geometry="primitive: sphere; radius: 10" material="shader: flat; src: #video" position="0 1.6 -10"></a-entity>
+    <a-entity id="video-entity" geometry="primitive: plane; height: 5; width: 9" material="shader: flat; src: #video" position="0 1.6 -5"></a-entity>
 
     <a-entity id="left-eye" camera="eye:left" look-controls></a-entity>
     <a-entity id="right-eye" camera="eye:right" look-controls></a-entity>
@@ -36,18 +36,30 @@
     });
 
     function enterVRMode() {
+      if (videoElement.paused) {
+        videoElement.play();
+      }
+
       vrModeButton.setAttribute("visible", "false");
-      videoElement.play();
+      videoEntity.setAttribute("visible", "true");
+      videoEntity.setAttribute("position", "0 0 -5");
+
+      const leftEye = document.querySelector("#left-eye");
+      const rightEye = document.querySelector("#right-eye");
+
+      leftEye.setAttribute("camera", "active", true);
+      rightEye.setAttribute("camera", "active", true);
+      leftEye.setAttribute("look-controls", "enabled", true);
+      rightEye.setAttribute("look-controls", "enabled", true);
     }
 
     function loadYouTubeVideo(videoId) {
-      const youtubeUrl = `https://www.youtube.com/embed/${videoId}?autoplay=0&controls=0&playsinline=1&rel=0&showinfo=0&iv_load_policy=3`;
+      const youtubeUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&playsinline=1&rel=0&showinfo=0&iv_load_policy=3`;
 
       videoElement.setAttribute("src", youtubeUrl);
-      videoElement.setAttribute("webkit-playsinline", "true");
-      videoElement.load();
     }
 
+    // Example video URL: https://www.youtube.com/watch?v=dQw4w9WgXcQ
     const videoUrl = prompt("Enter a YouTube video URL:");
     const videoId = getVideoIdFromUrl(videoUrl);
 
